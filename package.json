@@ -7,6 +7,7 @@
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "express": "^4.17.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router": "^6.0.2",
@@ -17,12 +18,13 @@
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "./node_modules/.bin/jest",
+    "test": "jest",
     "update-snapshot": "jest --updateSnapshot",
     "eject": "react-scripts eject",
-    "lint": "npx eslint ."
+    "lint": "npx eslint .",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "eslintConfig": {
     "extends": [
@@ -49,11 +51,24 @@
     "eslint-plugin-react": "^7.28.0",
     "gh-pages": "^3.2.3",
     "jest-cli": "^27.4.5",
+    "nodemon": "^2.0.15",
     "react-test-renderer": "^17.0.2"
   },
   "jest": {
     "transform": {
       "^.+\\.(js|jsx)$": "babel-jest"
     }
+  },
+  "description": "`/routes` — папка с файлами роутера  \r `/controllers` — папка с файлами контроллеров пользователя и карточки   \r `/models` — папка с файлами описания схем пользователя и карточки",
+  "main": ".eslintrc.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DariaKutuzova/express-mesto.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DariaKutuzova/express-mesto/issues"
   }
 }
