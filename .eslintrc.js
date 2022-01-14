@@ -5,11 +5,12 @@ module.exports = {
     "es2021": true
   },
   "ignorePatterns": [".eslintrc.js"],
-  "extends": "airbnb-base",
+  "extends": ["airbnb-base", "prettier"],
   "parserOptions": {
     "ecmaVersion": 13
   },
   "rules": {
+    "quotes": "off",
     "no-console": "off",
     "no-underscore-dangle": [
       "error",

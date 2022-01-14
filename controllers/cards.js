@@ -1,8 +1,7 @@
 const Card = require('../models/card');
 const {BAD_REQUEST, NOT_FOUND, ERROR_DEFAULT} = require('../utils/errors');
 
-const getCards = (request, response) => {
-  return Card
+const getCards = (request, response) => Card
     .find({})
     .then(cards => response.status(200).send(cards))
     .catch((err) => {
@@ -11,8 +10,7 @@ const getCards = (request, response) => {
       } else {
         response.status(ERROR_DEFAULT).send({message: 'Ошибка сервера'});
       }
-    });
-}
+    })
 
 const deleteCard = (request, response) => {
     Card.findByIdAndRemove(request.params.cardId)

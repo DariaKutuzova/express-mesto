@@ -1,8 +1,7 @@
 const User = require('../models/user');
 const {BAD_REQUEST, NOT_FOUND, ERROR_DEFAULT} = require('../utils/errors');
 
-const getUsers = (request, response) => {
-  return User
+const getUsers = (request, response) => User
     .find({})
     .then((users) => response.status(200).send(users))
     .catch((err) => {
@@ -11,8 +10,7 @@ const getUsers = (request, response) => {
       } else {
         response.status(ERROR_DEFAULT).send({message: 'Ошибка сервера'});
       }
-    });
-}
+    })
 
 const getUser = (request, response) => {
   const {userId} = request.params
