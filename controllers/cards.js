@@ -1,25 +1,43 @@
-const Card = require('../models/card')
+const Card = require('../models/card');
+const {BAD_REQUEST, NOT_FOUND, ERROR_DEFAULT} = require('../utils/errors');
 
 const getCards = (request, response) => {
   return Card
     .find({})
     .then(cards => response.status(200).send(cards))
-    .catch(err => response.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        response.status(BAD_REQUEST).send({message: 'Переданы некорректные данные'});
+      } else {
+        response.status(ERROR_DEFAULT).send({message: 'Ошибка сервера'});
+      }
+    });
 }
 
 const deleteCard = (request, response) => {
-    Card.findByIdAndRemove(request.params.id)
+    Card.findByIdAndRemove(request.params.cardId)
       .then(user => response.send({ data: user }))
-      .catch(err => response.status(500).send({ message: err.message }));
+      .catch((err) => {
+        if (err.message === 'NotFound') {
+          response.status(NOT_FOUND).send({message: 'Карточка с указанным _id не найдена.'});
+        }
+      });
 }
 
 const createCard = (request, response) => {
 
-  const { name, link } = request.body;
+  const { name, link, owner } = request.body;
 
-  Card.create({ name, link })
+  Card.create({ name, link, owner })
     .then(card => response.send({ data: card }))
-    .catch(err => response.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        response.status(BAD_REQUEST).send({message: 'Переданы некорректные данные при создании пользователя'});
+      } else {
+        console.log(err)
+        response.status(ERROR_DEFAULT).send({message: 'Ошибка сервера'});
+      }
+    });
 }
 
 const setLike = (request, response) => {
@@ -30,10 +48,20 @@ const setLike = (request, response) => {
     { new: true }
   )
     .then(card => response.send({ data: card }))
-    .catch(err => response.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        response.status(BAD_REQUEST).send({message: 'Переданы некорректные данные постановки лайка.'});
+      } else if (err.message === 'NotFound') {
+        response.status(NOT_FOUND).send({message: 'Передан несуществующий _id карточки.'});
+      } else {
+        response.status(ERROR_DEFAULT).send({message: 'Ошибка сервера'});
+      }
+    });
 }
 
 const deleteLike = (request, response) => {
+
+  console.log(request.user)
 
   Card.findByIdAndUpdate(
     request.params.cardId,
@@ -41,7 +69,15 @@ const deleteLike = (request, response) => {
     { new: true },
   )
     .then(card => response.send({ data: card }))
-    .catch(err => response.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        response.status(BAD_REQUEST).send({message: 'Переданы некорректные данные снятия лайка.'});
+      } else if (err.message === 'NotFound') {
+        response.status(NOT_FOUND).send({message: 'Передан несуществующий _id карточки.'});
+      } else {
+        response.status(ERROR_DEFAULT).send({message: 'Ошибка сервера'});
+      }
+    });
 }
 
 module.exports = {
