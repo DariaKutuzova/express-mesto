@@ -14,15 +14,19 @@ const getUsers = (request, response) => User
 
 const getUser = (request, response) => {
   const {userId} = request.params
-  console.log(request.params)
 
   return User
     .findById(userId)
     .orFail(() => new Error('NotFound'))
-    .then((user) => response.status(200).send(user))
+    .then((user) => {
+      if (!user) {
+        return response.status(NOT_FOUND).send({ message: 'Нет пользователя с таким id' });
+      }
+      return response.status(200).send(user);
+    })
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        response.status(NOT_FOUND).send({message: 'Запрашиваемый пользователь не найден'});
+      if (err.name === 'CastError') {
+        response.status(BAD_REQUEST).send({message: 'Переданы некорректные данные'});
       } else {
         response.status(ERROR_DEFAULT).send({message: 'Ошибка сервера'});
       }
@@ -36,8 +40,8 @@ const createUser = (request, response) => {
   User.create({name, about, avatar})
     .then(user => response.send({data: user}))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        response.status(BAD_REQUEST).send({message: 'Переданы некорректные данные'});
+      if (err.name === 'ValidationError') {
+        return response.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
       } else {
         response.status(ERROR_DEFAULT).send({message: 'Ошибка сервера'});
       }
@@ -48,11 +52,16 @@ const patchUser = (request, response) => {
 
   const {name, about} = request.body;
 
-  return User.findByIdAndUpdate(request.user._id, {name, about}, {new: true})
+  return User.findByIdAndUpdate(request.user._id, {name, about}, {new: true}, {runValidators: true})
     .orFail(() => new Error('NotFound'))
-    .then(user => response.send({data: user}))
+    .then((user) => {
+      if (!user) {
+        return response.status(NOT_FOUND).send({ message: 'Нет пользователя с таким id' });
+      }
+      return response.status(200).send(user);
+    })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         response.status(BAD_REQUEST).send({message: 'Переданы некорректные данные при обновлении профиля.'});
       } else if (err.message === 'NotFound') {
         response.status(NOT_FOUND).send({message: 'Пользователь с указанным _id не найден.'});
@@ -66,11 +75,16 @@ const patchUser = (request, response) => {
 
     const {avatar} = request.body;
 
-    return User.findByIdAndUpdate(request.user._id, {avatar}, {new: true})
+    return User.findByIdAndUpdate(request.user._id, {avatar}, {new: true}, {runValidators: true})
       .orFail(() => new Error('NotFound'))
-      .then(user => response.send({data: user}))
+      .then((user) => {
+        if (!user) {
+          return response.status(NOT_FOUND).send({ message: 'Нет пользователя с таким id' });
+        }
+        return response.status(200).send(user);
+      })
       .catch((err) => {
-        if (err.name === 'CastError') {
+        if (err.name === 'ValidationError' || err.name === 'CastError') {
           response.status(BAD_REQUEST).send({message: 'Переданы некорректные данные при обновлении аватара.'});
         } else if (err.message === 'NotFound') {
           response.status(NOT_FOUND).send({message: 'Пользователь с указанным _id не найден.'});
