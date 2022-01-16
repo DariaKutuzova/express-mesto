@@ -17,7 +17,7 @@ const getUser = (request, response) => {
 
   return User
     .findById(userId)
-    .orFail(() => new Error('NotFound'))
+    // .orFail(() => new Error('NotFound'))
     .then((user) => {
       if (!user) {
         return response.status(NOT_FOUND).send({ message: 'Нет пользователя с таким id' });
@@ -52,8 +52,8 @@ const patchUser = (request, response) => {
 
   const {name, about} = request.body;
 
-  return User.findByIdAndUpdate(request.user._id, {name, about}, {new: true}, {runValidators: true})
-    .orFail(() => new Error('NotFound'))
+  return User.findByIdAndUpdate(request.user._id, {name, about}, {new: true, runValidators: true,})
+    // .orFail(() => new Error('NotFound'))
     .then((user) => {
       if (!user) {
         return response.status(NOT_FOUND).send({ message: 'Нет пользователя с таким id' });
@@ -75,8 +75,8 @@ const patchUser = (request, response) => {
 
     const {avatar} = request.body;
 
-    return User.findByIdAndUpdate(request.user._id, {avatar}, {new: true}, {runValidators: true})
-      .orFail(() => new Error('NotFound'))
+    return User.findByIdAndUpdate(request.user._id, {avatar}, {new: true, runValidators: true})
+      // .orFail(() => new Error('NotFound'))
       .then((user) => {
         if (!user) {
           return response.status(NOT_FOUND).send({ message: 'Нет пользователя с таким id' });
