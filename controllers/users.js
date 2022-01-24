@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const {BAD_REQUEST, NOT_FOUND, ERROR_DEFAULT} = require('../utils/errors');
 
@@ -33,11 +35,35 @@ const getUser = (request, response) => {
     });
 }
 
+const getUserMe = (request, response) => {
+  const {userId} = request.params
+
+  return User
+    .findById(userId)
+    .then((user) => {
+      if (!user) {
+        return response.status(NOT_FOUND).send({ message: 'Нет пользователя с таким id' });
+      }
+      return response.status(200).send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        response.status(BAD_REQUEST).send({message: 'Переданы некорректные данные'});
+      } else {
+        response.status(ERROR_DEFAULT).send({message: 'Ошибка сервера'});
+      }
+    });
+}
+
 const createUser = (request, response) => {
 
-  const {name, about, avatar} = request.body;
+  const {name, about, avatar, email, password} = request.body;
 
-  User.create({name, about, avatar})
+  bcrypt.hash(password, 10)
+    .then(hash => User.create({
+      name, about, avatar, email,
+      password: hash, // записываем хеш в базу
+    }))
     .then(user => response.send({data: user}))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -94,10 +120,31 @@ const patchUser = (request, response) => {
       });
   }
 
+const login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      // создадим токен
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key',
+        { expiresIn: '7d' });
+
+      // вернём токен
+      res.send({ token });
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
+};
+
     module.exports = {
       getUsers,
       getUser,
       createUser,
       patchUser,
-      patchAvatar
+      patchAvatar,
+      login,
+      getUserMe
     }
