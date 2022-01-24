@@ -35,24 +35,10 @@ const getUser = (request, response) => {
     });
 }
 
-const getUserMe = (request, response) => {
-  const {userId} = request.params
-
-  return User
-    .findById(userId)
-    .then((user) => {
-      if (!user) {
-        return response.status(NOT_FOUND).send({ message: 'Нет пользователя с таким id' });
-      }
-      return response.status(200).send(user);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        response.status(BAD_REQUEST).send({message: 'Переданы некорректные данные'});
-      } else {
-        response.status(ERROR_DEFAULT).send({message: 'Ошибка сервера'});
-      }
-    });
+const getUserMe = (request, response, next) => {
+  const user = request.user;
+  response.render('me', { title: 'me', user: user });
+  next();
 }
 
 const createUser = (request, response) => {
