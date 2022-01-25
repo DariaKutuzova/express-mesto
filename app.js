@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
 const {login, createUser} = require('./controllers/users.js');
 const auth = require('./middlewares/auth');
+const errorHandler = require('./middlewares/error-handler');
 
 const { PORT = 3000 } = process.env
 
@@ -22,6 +23,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
 }, (err) => {
   if (err){console.log(err)}})
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Application is running on port ${PORT}`)
