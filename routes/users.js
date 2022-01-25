@@ -7,9 +7,9 @@ const { getUsers,
   getUserMe} = require('../controllers/users');
 
 router.get('/', getUsers);
+router.get('/me', getUserMe);
 router.get('/:userId', getUser);
 router.patch('/me', patchUser);
-router.get('/me', getUserMe);
 router.patch('/me/avatar', patchAvatar);
 
 module.exports = router

@@ -37,9 +37,14 @@ const getUser = (request, response, next) => {
 }
 
 const getUserMe = (request, response, next) => {
-  const user = request.user;
-  response.render('me', {user: user});
-  next();
+  User
+    .find()
+    .then((users) => {
+      response.status(200).send(users);
+    })
+    .catch((err) => {
+      next(err);
+    });
 }
 
 const createUser = (request, response, next) => {
@@ -54,7 +59,9 @@ const createUser = (request, response, next) => {
     .then(user => response.send({data: user}))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные');
+        next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
+      } else if (err.code === 11000) {
+        next(new ConflictError(`Пользователь с данным email уже существует`));
       }
     })
     .catch(next);
@@ -73,9 +80,9 @@ const patchUser = (request, response, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные');
+        next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
       } else if (err.message === 'NotFound') {
-        throw new NotFoundError('Нет пользователя с таким id');
+        next(new NotFoundError('Нет пользователя с таким id'));
       }
     })
     .catch(next);
@@ -94,9 +101,9 @@ const patchAvatar = (request, response, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные');
+        next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
       } else if (err.message === 'NotFound') {
-        throw new NotFoundError('Нет пользователя с таким id');
+        next(new NotFoundError('Нет пользователя с таким id'));
       }
     })
     .catch(next);
@@ -111,7 +118,13 @@ const login = (req, res, next) => {
       const token = jwt.sign({_id: user._id}, 'some-secret-key',
         {expiresIn: '7d'});
       // вернём токен
-      res.send({token});
+      res
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+          sameSite: true,
+        })
+        .send({ message: 'Успешная авторизация' });
     })
     .catch(next);
 };

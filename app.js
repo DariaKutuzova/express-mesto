@@ -4,10 +4,17 @@ const mongoose = require('mongoose');
 const {login, createUser} = require('./controllers/users.js');
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/error-handler');
+const NotFoundError = require("./errors/NotFoundError");
 
 const { PORT = 3000 } = process.env
 
-const app = express()
+const app = express();
+mongoose.connect('mongodb://localhost:27017/mestodb', {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+}, (err) => {
+  if (err){console.log(err)}})
 
 app.use(bodyParser.json());
 
@@ -17,12 +24,9 @@ app.use(auth);
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-mongoose.connect('mongodb://localhost:27017/mestodb', {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-}, (err) => {
-  if (err){console.log(err)}})
+app.use((res, req, next) => {
+  next(new NotFoundError('Страницы не существует'));
+});
 
 app.use(errorHandler);
 
