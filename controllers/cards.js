@@ -6,40 +6,40 @@ const ForbiddenError = require('../errors/ForbiddenError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const getCards = (request, response, next) => Card
-    .find({})
-    .then(cards => response.status(200).send(cards))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
-      } else next(err)
-    })
+  .find({})
+  .populate('owner')
+  .then(cards => response.status(200).send(cards))
+  .catch((err) => {
+    if (err.name === 'CastError') {
+      next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
+    } else next(err)
+  })
 
 const deleteCard = (request, response, next) => {
-    Card.findByIdAndRemove(request.params.cardId)
-      .then((card) => {
-        if (card.owner.toString() !== request.user._id) {
-          next(new ForbiddenError('У вас недостаточно прав для удаленя карточки'));
-        }
-      })
-      .then((card) => {
-        if (!card) {
-          next(new NotFoundError('Карточка не найдена'));
-        }
-        return response.status(200).send(card);
-      })
-      .catch((err) => {
-        if (err.name === 'CastError') {
-          next(new NotFoundError('Карточка не найдена'));
-        } else next(err)
-      });
+  Card.findById(request.params.cardId)
+    .orFail()
+    .catch(() => {
+      next(new NotFoundError(`Карточки не существует`));
+    })
+    .then((card) => {
+      if (card.owner.toString() !== request.user._id) {
+        next(new ForbiddenError('Недостаточно прав для выполнения операции'));
+      }
+      Card.findByIdAndDelete(request.params.cardId)
+        .then((card) => {
+          return response.status(200).send(card);
+        })
+        .catch(next);
+    })
+    .catch(next);
 }
 
 const createCard = (request, response, next) => {
 
-  const { name, link, owner } = request.body;
-
-  Card.create({ name, link, owner })
-    .then(card => response.send({ data: card }))
+  const {name, link} = request.body;
+  console.log(request.body)
+  Card.create({name, link, owner: request.user._id})
+    .then(card => response.send({data: card}))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
@@ -51,8 +51,8 @@ const setLike = (request, response, next) => {
 
   Card.findByIdAndUpdate(
     request.params.cardId,
-    { $addToSet: { likes: request.user._id } }, // добавить _id в массив, если его там нет
-    { new: true }
+    {$addToSet: {likes: request.user._id}}, // добавить _id в массив, если его там нет
+    {new: true}
   )
     .then((card) => {
       if (!card) {
@@ -75,8 +75,8 @@ const deleteLike = (request, response, next) => {
 
   Card.findByIdAndUpdate(
     request.params.cardId,
-    { $pull: { likes: request.user._id } }, // убрать _id из массива
-    { new: true },
+    {$pull: {likes: request.user._id}}, // убрать _id из массива
+    {new: true},
   )
     .then((card) => {
       if (!card) {

@@ -9,6 +9,8 @@ module.exports = (req, res, next) => {
   }
 
   const token = authorization.replace('Bearer ', '');
+  // const token = req.cookies.jwt;
+  console.log(token)
   let payload;
 
   try {
@@ -16,7 +18,7 @@ module.exports = (req, res, next) => {
   } catch (err) {
     throw new UnauthorizedError('Необходима авторизация');
   }
-
+  console.log(payload)
   req.user = payload;
 
   next();

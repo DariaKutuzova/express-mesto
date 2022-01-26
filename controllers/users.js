@@ -37,14 +37,11 @@ const getUser = (request, response, next) => {
 }
 
 const getUserMe = (request, response, next) => {
-  User
-    .find()
-    .then((users) => {
-      response.status(200).send(users);
-    })
-    .catch((err) => {
-      next(err);
-    });
+
+  const user = request.user;
+  return response.status(200).send(user);
+  next();
+
 }
 
 const createUser = (request, response, next) => {
@@ -119,12 +116,13 @@ const login = (req, res, next) => {
         {expiresIn: '7d'});
       // вернём токен
       res
-        .cookie('jwt', token, {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
-          sameSite: true,
-        })
-        .send({ message: 'Успешная авторизация' });
+        // .cookie('jwt', token, {
+        //   maxAge: 3600000 * 24 * 7,
+        //   httpOnly: true,
+        //   sameSite: true,
+        // })
+        // .send({message: 'Успешная авторизация'})
+        .send({token});
     })
     .catch(next);
 };
