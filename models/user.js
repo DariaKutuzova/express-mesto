@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const UnauthorizedError = require("../errors/UnauthorizedError");
+const {validationLink} = require("../middlewares/validation");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -17,6 +18,10 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
+    validate: {
+      validator: validationLink,
+      message: props => `${props.value} is not a valid link!`
+    },
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png'
   },
   email: {

@@ -44,11 +44,16 @@ const validationCard = celebrate({
   }),
 });
 
+function validationLink(v) {
+  return /^(https?:\/\/)?(www.)?[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?$/.test(v);
+}
+
 module.exports = {
   validationLogin,
   validationUser,
   validationId,
   validationUpdateAvatar,
   validationUpdateUser,
-  validationCard
+  validationCard,
+  validationLink
 }

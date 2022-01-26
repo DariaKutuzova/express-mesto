@@ -1,6 +1,6 @@
 const { validationId,
   validationUpdateAvatar,
-  validationUpdateUser } = require('celebrate');
+  validationUpdateUser } = require('../middlewares/validation');
 const router = require('express').Router()
 
 const { getUsers,
