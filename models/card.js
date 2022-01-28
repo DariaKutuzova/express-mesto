@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const { validationUrl } = require("../middlewares/validation");
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -12,7 +13,7 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (link) => validator.isUrl(link),
+      validator: validationUrl,
       message: 'Поле link не прошло валидацию',
     },
   },

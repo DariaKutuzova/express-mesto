@@ -15,10 +15,7 @@ const getCards = (request, response, next) => Card
 
 const deleteCard = (request, response, next) => {
   Card.findById(request.params.cardId)
-    .orFail()
-    .catch(() => {
-      next(new NotFoundError(`Карточки не существует`));
-    })
+    .orFail(new NotFoundError(`Карточки не существует`))
     .then((card) => {
       if (card.owner.toString() !== request.user._id) {
         next(new ForbiddenError('Недостаточно прав для выполнения операции'));

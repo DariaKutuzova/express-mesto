@@ -52,7 +52,11 @@ const createUser = (request, response, next) => {
       email,
       password: hash, // записываем хеш в базу
     }))
-    .then((user) => response.send({ data: user }))
+    .then((user) => response.send({ _id: user._id,
+      name,
+      about,
+      avatar,
+      email }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
