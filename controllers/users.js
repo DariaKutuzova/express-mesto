@@ -16,7 +16,7 @@ const getUsers = (request, response, next) => User
   .catch(next);
 
 const getUser = (request, response, next) => {
-  const {userId} = request.params
+  const { userId } = request.params;
 
   return User
     .findById(userId)
@@ -32,26 +32,27 @@ const getUser = (request, response, next) => {
       }
     })
     .catch(next);
-}
+};
 
-const getUserMe = (request, response, next) => {
-
-  const user = request.user;
+const getUserMe = (request, response) => {
+  const { user } = request;
   return response.status(200).send(user);
-  next();
-
-}
+};
 
 const createUser = (request, response, next) => {
-
-  const {name, about, avatar, email, password} = request.body;
+  const {
+    name, about, avatar, email, password,
+  } = request.body;
 
   bcrypt.hash(password, 10)
-    .then(hash => User.create({
-      name, about, avatar, email,
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
       password: hash, // записываем хеш в базу
     }))
-    .then(user => response.send({data: user}))
+    .then((user) => response.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
@@ -60,13 +61,16 @@ const createUser = (request, response, next) => {
       }
     })
     .catch(next);
-}
+};
 
 const patchUser = (request, response, next) => {
+  const { name, about } = request.body;
 
-  const {name, about} = request.body;
-
-  return User.findByIdAndUpdate(request.user._id, {name, about}, {new: true, runValidators: true,})
+  return User.findByIdAndUpdate(
+    request.user._id,
+    { name, about },
+    { new: true, runValidators: true },
+  )
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
@@ -81,13 +85,12 @@ const patchUser = (request, response, next) => {
       }
     })
     .catch(next);
-}
+};
 
 const patchAvatar = (request, response, next) => {
+  const { avatar } = request.body;
 
-  const {avatar} = request.body;
-
-  return User.findByIdAndUpdate(request.user._id, {avatar}, {new: true, runValidators: true})
+  return User.findByIdAndUpdate(request.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
@@ -102,16 +105,19 @@ const patchAvatar = (request, response, next) => {
       }
     })
     .catch(next);
-}
+};
 
 const login = (req, res, next) => {
-  const {email, password} = req.body;
+  const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
       // создадим токен
-      const token = jwt.sign({_id: user._id}, 'some-secret-key',
-        {expiresIn: '7d'});
+      const token = jwt.sign(
+        { _id: user._id },
+        'some-secret-key',
+        { expiresIn: '7d' },
+      );
       // вернём токен
       res
         .cookie('jwt', token, {
@@ -119,8 +125,8 @@ const login = (req, res, next) => {
           httpOnly: true,
           sameSite: true,
         })
-        .send({message: 'Успешная авторизация'})
-        .send({token});
+        .send({ message: 'Успешная авторизация' });
+      // .send({token});
     })
     .catch(next);
 };
@@ -132,5 +138,5 @@ module.exports = {
   patchUser,
   patchAvatar,
   login,
-  getUserMe
-}
+  getUserMe,
+};

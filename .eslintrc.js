@@ -5,7 +5,7 @@ module.exports = {
     "es2021": true
   },
   "ignorePatterns": [".eslintrc.js"],
-  "extends": ["airbnb-base", "prettier"],
+  "extends": ["airbnb-base"],
   "parserOptions": {
     "ecmaVersion": 13
   },

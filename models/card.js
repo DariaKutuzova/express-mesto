@@ -6,15 +6,15 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 2,
-    maxlength: 30
+    maxlength: 30,
   },
   link: {
     type: String,
     required: true,
     validate: {
       validator: (link) => validator.isUrl(link),
-      message: 'Поле link не прошло валидацию'
-    }
+      message: 'Поле link не прошло валидацию',
+    },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -28,7 +28,7 @@ const cardSchema = new mongoose.Schema({
   createdAt: {
     type: mongoose.Schema.Types.Date,
     default: Date.now,
-  }
-})
+  },
+});
 
-module.exports = mongoose.model('card', cardSchema)
+module.exports = mongoose.model('card', cardSchema);

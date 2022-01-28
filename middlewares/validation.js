@@ -3,7 +3,7 @@ const validator = require('validator');
 const BadRequestError = require("../errors/BadRequestError");
 
 const validationUrl = (value) => {
-  if (!validator.isURL(value, {require_protocol: true})) {
+  if (!validator.isURL(value, { require_protocol: true })) {
     throw new BadRequestError('Невалидный URL');
   }
   return value;
@@ -12,27 +12,27 @@ const validationUrl = (value) => {
 const validationUpdateUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    about: Joi.string().required().min(2).max(30)
+    about: Joi.string().required().min(2).max(30),
   }),
-})
+});
 
 const validationUpdateAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().custom(validationUrl)
+    avatar: Joi.string().required().custom(validationUrl),
   }),
-})
+});
 
 const validationIdUser = celebrate({
   params: Joi.object().keys({
     userId: Joi.string().alphanum().length(24),
-  })
-})
+  }),
+});
 
 const validationIdCard = celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().alphanum().length(24),
-  })
-})
+  }),
+});
 
 const validationUser = celebrate({
   body: Joi.object().keys({
@@ -54,12 +54,12 @@ const validationLogin = celebrate({
 const validationCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().custom(validationUrl)
+    link: Joi.string().required().custom(validationUrl),
   }),
 });
 
 function validationLink(v) {
-  return /^(https?:\/\/)?(www.)?[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?$/.test(v);
+  return /^(https?:\/\/)?(www.)?[a-zA-Z0-9\-.]+\.[a-zA-Z]{2,3}(\/\S*)?$/.test(v);
 }
 
 module.exports = {
@@ -70,5 +70,5 @@ module.exports = {
   validationUpdateAvatar,
   validationUpdateUser,
   validationCard,
-  validationLink
-}
+  validationLink,
+};
