@@ -1,4 +1,4 @@
-const {BAD_REQUEST, NOT_FOUND, ERROR_DEFAULT} = require('../utils/errors');
+const {ERROR_DEFAULT} = require('../utils/errors');
 const errorHandler = (err, req, res, next) => {
   const statusCode = err.statusCode || ERROR_DEFAULT;
 

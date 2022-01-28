@@ -114,12 +114,12 @@ const login = (req, res, next) => {
         {expiresIn: '7d'});
       // вернём токен
       res
-        // .cookie('jwt', token, {
-        //   maxAge: 3600000 * 24 * 7,
-        //   httpOnly: true,
-        //   sameSite: true,
-        // })
-        // .send({message: 'Успешная авторизация'})
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+          sameSite: true,
+        })
+        .send({message: 'Успешная авторизация'})
         .send({token});
     })
     .catch(next);
