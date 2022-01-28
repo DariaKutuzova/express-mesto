@@ -71,5 +71,5 @@ module.exports = {
   validationUpdateUser,
   validationCard,
   validationLink,
-  validationUrl
+  validationUrl,
 };
