@@ -68,18 +68,21 @@ const deleteLike = (request, response, next) => {
     { $pull: { likes: request.user._id } }, // убрать _id из массива
     { new: true },
   )
+    .orFail(() => new NotFoundError('Карточка не найдена'))
     .then((card) => {
-      if (!card) {
-        next(new NotFoundError('Карточка не найдена'));
-      }
+      // if (!card) {
+      //   next(new NotFoundError('Карточка не найдена'));
+      // }
       return response.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
-      } else if (err.message === 'NotFound') {
-        next(new NotFoundError('Нет пользователя с таким id'));
-      } else next(err);
+      }
+      // else if (err.message === 'NotFound') {
+      //   next(new NotFoundError('Карточка не найдена'));
+      // }
+      else next(err);
     });
 };
 

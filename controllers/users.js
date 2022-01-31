@@ -20,6 +20,7 @@ const getUser = (request, response, next) => {
 
   return User
     .findById(userId)
+    // .orFail(() => new NotFoundError('Нет пользователя с таким id'))
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
@@ -27,11 +28,13 @@ const getUser = (request, response, next) => {
       return response.status(200).send(user);
     })
     .catch((err) => {
+      console.log(err.name)
       if (err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные');
-      }
+        next(new BadRequestError('Переданы некорректные данные'));
+      } else next(err)
+
     })
-    .catch(next);
+    // .catch(next)
 };
 
 const getUserMe = (request, response) => {
