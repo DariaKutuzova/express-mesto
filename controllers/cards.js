@@ -69,20 +69,11 @@ const deleteLike = (request, response, next) => {
     { new: true },
   )
     .orFail(() => new NotFoundError('Карточка не найдена'))
-    .then((card) => {
-      // if (!card) {
-      //   next(new NotFoundError('Карточка не найдена'));
-      // }
-      return response.status(200).send(card);
-    })
+    .then((card) => response.status(200).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
-      }
-      // else if (err.message === 'NotFound') {
-      //   next(new NotFoundError('Карточка не найдена'));
-      // }
-      else next(err);
+      } else next(err);
     });
 };
 
